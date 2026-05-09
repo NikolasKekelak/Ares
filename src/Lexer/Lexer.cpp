@@ -123,11 +123,22 @@ void Lexer::_number() {
 }
 
 void Lexer::_char() {
-    TODO("No char implemented");
+    advance();
+    if (peekNext() == '\\') {
+        advance();
+        advance();
+    } else {
+        advance();
+    }
+    advance();
+    addToken(TK_CHAR_LITERAL, source.substr(start, current - start));
 }
 
 void Lexer::_string() {
-    TODO("No string implemented");
+    while (peekNext() != '\"' && !isAtEnd()) advance();
+    advance();
+    auto str = source.substr(start, current - start);
+    addToken(TK_LITERAL, str);
 }
 
 void Lexer::_identifier() {

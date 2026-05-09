@@ -23,8 +23,6 @@ inline std::string readFileToString(const std::string& filename) {
 int main() {
 
     auto source = readFileToString("test.ares");
-    std::cout<<source;
-
     Lexer lexer;
     lexer.setSource(source);
     lexer.scanTokens();
