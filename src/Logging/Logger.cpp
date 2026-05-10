@@ -5,6 +5,8 @@
 #include "Logger.h"
 
 
+std::ofstream Logger::logFile;
+
 
 std::string translateLogLevel(LogLevel level) {
     switch (level) {
@@ -24,15 +26,15 @@ void Logger::setLogFile(std::string filename) {
     logFile.open(filename, std::ios::out | std::ios::app);
 }
 
-void Logger::Log(std::string message) {
+void Logger::Log(std::string& message) {
     logFile << message << std::endl;
 }
 
-void Logger::Log(LogLevel level, std::string message) {
+void Logger::Log(LogLevel level, std::string& message) {
     logFile << "["<<translateLogLevel(level) << "] " << message << std::endl;
 }
 
-void Logger::Log(LogLevel level, std::vector<std::string> message) {
+void Logger::Log(LogLevel level, std::vector<std::string>& message) {
     logFile << "["<<translateLogLevel(level) << "] ";
     for (auto &m : message) {
         logFile << m << " ";

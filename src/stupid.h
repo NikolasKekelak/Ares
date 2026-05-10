@@ -52,7 +52,7 @@ public:
 
 #ifdef TODO_SIMPLE
 #include <cstdio>
-#define TODO(msg) do {fprintf(stderr,"%s: %d %s", __FILE__, __LINE__, msg); exit(1); }while(0);
+#define TODO(msg) do {fprintf(stderr,"TODO: %s: %d %s", __FILE__, __LINE__, msg); exit(1); }while(0);
 #endif
 
 

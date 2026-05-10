@@ -1,3 +1,4 @@
+#include <cstring>
 #include <iostream>
 
 #include "src/Lexer/Lexer.h"
@@ -6,8 +7,10 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <sys/stat.h>
+#include "src/Ares/Ares.h"
 
-inline std::string readFileToString(const std::string& filename) {
+inline std::string readFileToString(const std::string &filename) {
     std::ifstream file(filename);
 
     if (!file.is_open()) {
@@ -19,28 +22,96 @@ inline std::string readFileToString(const std::string& filename) {
 
     return buffer.str();
 }
+// humbly stolen from https://stackoverflow.com/questions/12774207/fastest-way-to-check-if-a-file-exists-using-standard-c-c11-14-17-c
+inline bool file_exists (const std::string& name) {
+    struct stat buffer;
+    return (stat (name.c_str(), &buffer) == 0);
+}
 
-int main() {
-
-    auto source = readFileToString("test.ares");
-    Lexer lexer;
-    lexer.setSource(source);
-    lexer.scanTokens();
-    for (auto it: lexer.getTokens()) {
-        it.print();
+int main(int argc, char **argv) {
+    if (argc < 2) {
+        Ares::help();
     }
-    // std::vector<Token> program;
-    // program.emplace_back("1", "x", TK_INT, 0, 0);
-    // program.emplace_back("1", "1", TK_INT, 0, 0);
-    // program.emplace_back("1", "printf", TK_STDOUT, 0, 0);
-    // program.emplace_back("1", "format", TK_STRING, 0, 0);
-    // program.emplace_back("1", "x",      TK_NUMBER , 0, 0);
-    //
-    // compile_tokens_to_asm(
-    //     "test.asm"
-    //     ,{"printf"},{
-    //         {"format", "\"x = %d\""}
-    //     },program
-    //     );
-     return 0;
+
+    for (int i = 1; i < argc; i++) {
+        if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
+            Ares::help();
+            return 0;
+        }
+        if (!strcmp(argv[i], "-o") || !strcmp(argv[i], "--output")) {
+            if (i + 1 >= argc)
+                Ares::error(MISSING_ARGUMENT_AFTER_OUTPUT_FLAG);
+            Ares::setOutputFile(argv[++i]);
+            continue;
+        }
+        if (!strcmp(argv[i], "--tokens")) {
+            Ares::setPrintTokens();
+            continue;
+        }
+        if (!strcmp(argv[i], "--ast")) {
+            Ares::setPrintAST();
+            continue;
+        }
+        if (!strcmp(argv[i], "--asm")) {
+            Ares::setPrintASM();
+            continue;
+        }
+        if (!strcmp(argv[i], "--ir")) {
+            Ares::setPrintIR();
+            continue;
+        }
+        if (!strcmp(argv[i], "--no-compile")) {
+            Ares::setNoCompile();
+            continue;
+        }
+        if (!strcmp(argv[i], "--no-optim")) {
+            if (Ares::getOptimizationLevel() != 0) {
+                TODO("can change optimization only once")
+            }
+            Ares::setOptimizationLevel(-1);
+            continue;
+        }
+        if (!strcmp(argv[i], "-O1")) {
+            if (Ares::getOptimizationLevel() != 0) {
+                TODO("can change optimization only once")
+            }
+            Ares::setOptimizationLevel(1);
+            continue;
+        }
+        if (!strcmp(argv[i], "-O2")) {
+            if (Ares::getOptimizationLevel() != 0) {
+                TODO("can change optimization only once");
+            }
+            Ares::setOptimizationLevel(2);
+            continue;
+        }
+        if (!strcmp(argv[i], "-O3")) {
+            TODO("Aggresive optimizations to be added");
+            continue;
+        }
+        if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--version") ) {
+            TODO("Version system to be added")
+            continue;
+        }
+        if (!strcmp(argv[i], "-Wall")) {
+            TODO("All warnings will be added later")
+            continue;
+        }
+        if (!strcmp(argv[i], "-Wextra")) {
+            TODO("Warnings will be handled as errors... maybe")
+            continue;
+        }
+        if (argv[i][0] == '-') {
+            Ares::error(UNKNOWN_FLAG_ENCOUNTERED, argv[i]);
+            continue;
+        }
+        // no -.. = file to read
+        if (file_exists(argv[i])) {
+            Ares::init(readFileToString(argv[i]));
+            continue;
+        }
+        Ares::error(FILE_NOT_FOUND, argv[i]);
+    }
+    Ares::run();
+    return 0;
 }

@@ -20,15 +20,16 @@ enum LogLevel {
 std::string translateLogLevel(LogLevel level);
 
 class Logger {
+public:
     static std::ofstream logFile;
     
     static void setLogFile(std::string filename);
 
-    static void Log(std::string message);
+    static void Log(std::string& message);
 
-    static void Log(LogLevel level, std::string message);
+    static void Log(LogLevel level, std::string& message);
 
-    static void Log(LogLevel level, std::vector<std::string> message);
+    static void Log(LogLevel level, std::vector<std::string>& message);
 
     static void close();
 };

@@ -4,6 +4,7 @@
 
 #include "Lexer.h"
 #include "../myHeaders.h"
+#include "../Ares/Ares.h"
 
 void Lexer::scanTokens() {
     while (!isAtEnd()) {
@@ -13,7 +14,7 @@ void Lexer::scanTokens() {
     tokens.emplace_back("", "", TK_EOF, line, column);
 }
 
-std::vector<Token>& Lexer::getTokens() {
+std::vector<Token> &Lexer::getTokens() {
     return tokens;
 }
 
@@ -44,9 +45,9 @@ void Lexer::scanToken() {
         case '*': addToken(TK_STAR);
             break;
         case '/': if (match('/')) {
-            _comment();
-            break;
-        }
+                _comment();
+                break;
+            }
             addToken(TK_SLASH);
             break;
         case '%': addToken(TK_PERCENT);
@@ -71,16 +72,32 @@ void Lexer::scanToken() {
             break;
         case ':': addToken(match('=') ? TK_DOUBLE_COLON : TK_COLON);
 
-        case '\n':
+        case '\n': line++;
         case ' ': break;
 
-        case '\'': _char();break;
-        case '\"': _string();break;
+        case '\'': _char();
+            break;
+        case '\"': _string();
+            break;
+        default: {
+            if (isdigit(c)) {
+                _number();
+                return;
+            } else if (isalpha(c)) {
+                _identifier();
+                return;
+            }
+            else {
+                Token err = Token(std::string(1,c), "", TK_UNKNOWN, line, column);
+                Ares::error(UNKNOWN_CHARACTER_ENCOUNTERED,err.getErrorToken());
+            }
+        }
     }
 
-    if (isdigit(c)) _number();
-    else if (isalpha(c)) _identifier();
+
 }
+
+
 
 char Lexer::advance() {
     column++;

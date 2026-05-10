@@ -41,7 +41,9 @@ enum TokenType {
 
     TK_STDIN, TK_STDOUT, TK_STDERR,
 
-    TK_MAIN
+    TK_MAIN,
+
+    TK_UNKNOWN
 };
 
 inline std::string getToken(TokenType name) {
@@ -94,6 +96,9 @@ inline std::string getToken(TokenType name) {
         case TK_PUBLIC: return "TK_PUBLIC";
         case TK_PRIVATE: return "TK_PRIVATE";
         case TK_ASYNC: return "TK_ASYNC";
+        case TK_ATOMIC: return "TK_ATOMIC";
+        case TK_GLOBAL: return "TK_GLOBAL";
+        case TK_LOCAL: return "TK_LOCAL";
         case TK_VOID: return "TK_VOID";
         case TK_STDIN: return "TK_STDIN";
         case TK_STDOUT: return "TK_STDOUT";
@@ -142,7 +147,11 @@ public:
     [[nodiscard]] TokenType getType() const;
 
     void print() {
-        std::cout << "Token: " << lexeme << " " << getToken(type) << std::endl;
+        std::cout << getToken(type);
+        if (lexeme!="") {
+            std::cout << "(" << lexeme << ")";
+        }
+        std::cout << std::endl;
     }
 };
 
