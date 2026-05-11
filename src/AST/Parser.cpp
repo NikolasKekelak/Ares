@@ -66,23 +66,23 @@ bool Parser::match(const std::vector<TokenType>& types) {
 }
 
 bool Parser::check(TokenType type) const {
-    TODO("Check if the current token is of the given type without consuming it");
+    return peek().getType() == type;
 }
 
 Token Parser::advance() {
-    TODO("Consume the current token and return it");
+    return tokens[current++];
 }
 
 bool Parser::isAtEnd() const {
-    TODO("Check if the parser has reached the end of the token stream");
+    return current >= tokens.size();
 }
 
 Token Parser::peek() const {
-    TODO("Return the current token without consuming it");
+    return tokens[current];
 }
 
 Token Parser::previous() const {
-    TODO("Return the most recently consumed token");
+    return tokens[current - 1];
 }
 
 void Parser::synchronize() {
