@@ -42,8 +42,9 @@ void Ares::run() {
         program->print(0);
     }
 
-    if (!settings.compile)
-        exit(0);
+    if (!settings.compile) {
+        terminate();
+    }
 
     int optimization_level = settings.optimizationLevel;
     std::cout << "Optimization level: " << optimization_level << std::endl;
