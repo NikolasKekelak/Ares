@@ -6,6 +6,7 @@
 #define ARES_ERRORHANDLER_H
 #include <string>
 
+struct ErrorToken;
 
 enum ErrorCode {
     // Arg parsing error
@@ -20,9 +21,13 @@ enum ErrorCode {
 
 class ErrorHandler {
     static std::string errorString;
+    static ErrorToken errorToken;
+
 public:
     static void handleError(ErrorCode);
     static void setErrorString(const std::string& str);
+
+    static void setErrorToken(ErrorToken& token);
 };
 
 

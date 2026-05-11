@@ -10,6 +10,7 @@
 #include "../Ares/Ares.h"
 
 std::string ErrorHandler::errorString;
+ErrorToken ErrorHandler::errorToken;
 
 void ErrorHandler::handleError(ErrorCode code) {
     std::cout << "\033[31m" << "ares: error: " << "\033[0m";
@@ -23,10 +24,17 @@ void ErrorHandler::handleError(ErrorCode code) {
         case FILE_NOT_FOUND:
             std::cout << "file not found: " << errorString << std::endl;
             break;
+        case SYNTAX_ERROR:
+            std::cout << "syntax error: " << errorString << " "<< errorToken.line << "." << errorToken.column<<std::endl;
+        default: std::cout<< code << " " << errorString;
     }
     Ares::terminate();
 }
 
 void ErrorHandler::setErrorString(const std::string &str) {
     errorString = str;
+}
+
+void ErrorHandler::setErrorToken(ErrorToken &token) {
+    errorToken = token;
 }

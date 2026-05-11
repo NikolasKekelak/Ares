@@ -30,7 +30,7 @@ class Lexer {
         {"while", TK_WHILE},
         {"for", TK_FOR},
         {"return", TK_RETURN},
-        {"BREAK", TK_BREAK},
+        {"break", TK_BREAK},
         {"continue", TK_CONTINUE},
         {"true", TK_TRUE},
         {"false", TK_FALSE},
@@ -51,10 +51,8 @@ class Lexer {
         {"char", TK_CHAR},
         {"string", TK_STRING},
         {"float", TK_FLOAT},
-
-        {"printf", TK_STDIN},
-        {"scanf", TK_STDOUT},
-        {"stderr", TK_STDERR}
+        {"print", TK_STDOUT},
+        {"scanf", TK_STDIN}
 
     };
 

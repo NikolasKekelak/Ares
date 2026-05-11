@@ -4,6 +4,8 @@
 
 #include "Ares.h"
 
+#include "../AST/Parser.h"
+
 AresContext Ares::context;
 AresSettings Ares::settings;
 Lexer Ares::lexer;
@@ -25,18 +27,31 @@ void Ares::terminate() {
 
 void Ares::run() {
     lexer.scanTokens();
-    if (settings.printTokens)
-        for (auto it: lexer.getTokens())
+    if (settings.printTokens) {
+        for (auto it: lexer.getTokens()) {
             it.print();
+            std::cout << std::endl;
+        }
+    }
 
     // Parse AST
-    // TODO("Parsing")
-    // IR
-    // TODO("Generating IR")
+    Parser parser(lexer.getTokens());
+    auto program = parser.parseProgram();
+
+    if (settings.printAST) {
+        program->print(0);
+    }
+
+    if (!settings.compile)
+        exit(0);
+
     int optimization_level = settings.optimizationLevel;
+    std::cout << "Optimization level: " << optimization_level << std::endl;
     if (optimization_level < 0) {
         TODO("AST -> Source code")
     }
+
+    TODO("Compilation using IR is not defined yet")
     if (optimization_level >= 1) {
         TODO("Constant folding, dead code removal")
     }
@@ -46,7 +61,7 @@ void Ares::run() {
     }
 
     if (optimization_level >= 3) {
-        TODO("How did we got here")
+        TODO("How did we get here")
     }
     // Code gen
 }
@@ -68,6 +83,13 @@ void Ares::error(ErrorCode code, const std::string &msg) {
     ErrorHandler::setErrorString(msg);
     ErrorHandler::handleError(code);
 }
+
+void Ares::error(ErrorCode code, const std::string &msg, ErrorToken token) {
+    ErrorHandler::setErrorString(msg);
+    ErrorHandler::setErrorToken(token);
+    ErrorHandler::handleError(code);
+}
+
 
 void Ares::error(std::vector<std::string> &msg) {
     Logger::Log(ERROR, msg);

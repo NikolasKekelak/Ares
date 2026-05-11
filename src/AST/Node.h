@@ -17,6 +17,7 @@
 class Node {
 public:
     virtual ~Node() = default;
+    virtual void print(int indent) = 0;
 };
 
 // --- Expressions ---
@@ -36,6 +37,7 @@ public:
     Token op;
     std::unique_ptr<Expr> right;
 
+    void print(int indent) override;
     BinaryExpr(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right);
 };
 
@@ -44,6 +46,7 @@ public:
     Token op;
     std::unique_ptr<Expr> right;
 
+    void print(int indent) override;
     UnaryExpr(Token op, std::unique_ptr<Expr> right);
 };
 
@@ -52,6 +55,7 @@ public:
     Token value;
 
     explicit LiteralExpr(Token value);
+    void print(int indent) override;
 };
 
 class VariableExpr : public Expr {
@@ -59,6 +63,7 @@ public:
     Token name;
 
     explicit VariableExpr(Token name);
+    void print(int indent) override;
 };
 
 class AssignExpr : public Expr {
@@ -67,6 +72,7 @@ public:
     std::unique_ptr<Expr> value;
 
     AssignExpr(Token name, std::unique_ptr<Expr> value);
+    void print(int indent) override;
 };
 
 class CallExpr : public Expr {
@@ -75,6 +81,9 @@ public:
     std::vector<std::unique_ptr<Expr>> arguments;
 
     CallExpr(std::unique_ptr<Expr> callee, std::vector<std::unique_ptr<Expr>> arguments);
+    void print(int indent) override;
+
+
 };
 
 class MemberAccessExpr : public Expr {
@@ -83,6 +92,8 @@ public:
     Token member;
 
     MemberAccessExpr(std::unique_ptr<Expr> object, Token member);
+    void print(int indent) override;
+
 };
 
 // --- Statements ---
@@ -101,6 +112,7 @@ public:
     std::vector<std::unique_ptr<Node>> statements;
 
     explicit BlockStmt(std::vector<std::unique_ptr<Node>> statements);
+    void print(int indent) override;
 };
 
 class VarDeclStmt : public Stmt {
@@ -110,6 +122,7 @@ public:
     std::unique_ptr<Expr> initializer;
 
     VarDeclStmt(Token type, Token name, std::unique_ptr<Expr> initializer);
+    void print(int indent) override;
 };
 
 class PrintStmt : public Stmt {
@@ -117,6 +130,7 @@ public:
     std::vector<std::unique_ptr<Expr>> expressions;
 
     explicit PrintStmt(std::vector<std::unique_ptr<Expr>> expressions);
+    void print(int indent) override;
 };
 
 class ReadStmt : public Stmt {
@@ -124,6 +138,7 @@ public:
     std::vector<std::unique_ptr<Expr>> targets;
 
     explicit ReadStmt(std::vector<std::unique_ptr<Expr>> targets);
+    void print(int indent) override;
 };
 
 class ExpressionStmt : public Stmt {
@@ -131,6 +146,15 @@ public:
     std::unique_ptr<Expr> expression;
 
     explicit ExpressionStmt(std::unique_ptr<Expr> expression);
+    void print(int indent) override;
+};
+
+class ReturnStmt : public Stmt {
+public:
+    std::unique_ptr<Expr> value;
+
+    explicit ReturnStmt(std::unique_ptr<Expr> value);
+    void print(int indent) override;
 };
 
 // --- Declarations ---
@@ -152,6 +176,7 @@ public:
     std::unique_ptr<BlockStmt> body;
 
     FunctionDecl(Token returnType, Token name, std::vector<std::pair<Token, Token>> parameters, std::unique_ptr<BlockStmt> body);
+    void print(int indent) override;
 };
 
 class Program : public Node {
@@ -159,6 +184,7 @@ public:
     std::vector<std::unique_ptr<Node>> declarations;
 
     explicit Program(std::vector<std::unique_ptr<Node>> declarations);
+    void print(int indent) override;
 };
 
 #endif // ARES_NODE_H

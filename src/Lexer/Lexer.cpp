@@ -71,9 +71,14 @@ void Lexer::scanToken() {
         case ';': addToken(TK_SEMICOLON);
             break;
         case ':': addToken(match('=') ? TK_DOUBLE_COLON : TK_COLON);
+            break;
 
-        case '\n': line++;
-        case ' ': break;
+        case '\n':
+            line++;
+            column = 0;
+            break;
+        case ' ':
+            break;
 
         case '\'': _char();
             break;

@@ -54,6 +54,7 @@ public:
     static void error(ErrorCode code);
 
     static void error(ErrorCode code, const std::string& msg);
+    static void error(ErrorCode code, const std::string &msg, ErrorToken token);
 
     static void error(std::vector<std::string> &msg);
 

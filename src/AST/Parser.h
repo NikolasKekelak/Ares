@@ -46,7 +46,7 @@ class Parser {
 
     bool isAtEnd() const;
 
-    Token peek() const;
+    auto peek() const -> Token;
 
     Token previous() const;
 
