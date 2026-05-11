@@ -4,6 +4,7 @@
 
 #include "Parser.h"
 #include "../stupid.h"
+#include "../Ares/Ares.h"
 
 Parser::Parser(std::vector<Token> tokens) : tokens(std::move(tokens)) {
     TODO("Initialize parser state");
@@ -58,25 +59,35 @@ std::unique_ptr<Expr> Parser::parsePrimary() {
 }
 
 Token Parser::consume(TokenType type, const std::string& message) {
-    TODO("Consume a token of a specific type or report a syntax error");
+    if (peek().getType() == type) {
+        return advance();
+    }
+    Ares::error(SYNTAX_ERROR, message);
 }
 
 bool Parser::match(const std::vector<TokenType>& types) {
-    TODO("Check if the current token matches any of the given types and advance if it does");
+    for (auto type : types) {
+        if (check(type)) {
+            advance();
+            return true;
+        }
+    }
+    return false;
 }
 
 bool Parser::check(TokenType type) const {
+    if (isAtEnd()) return type == TK_EOF;
     return peek().getType() == type;
 }
 
 Token Parser::advance() {
-    return tokens[current++];
+    if (!isAtEnd()) current++;
+    return previous();
 }
 
 bool Parser::isAtEnd() const {
-    return current >= tokens.size();
+    return tokens.empty() || peek().getType() == TK_EOF;
 }
-
 Token Parser::peek() const {
     return tokens[current];
 }
