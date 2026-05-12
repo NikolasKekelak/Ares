@@ -26,7 +26,12 @@ void ErrorHandler::handleError(ErrorCode code) {
             break;
         case SYNTAX_ERROR:
             std::cout << "syntax error: " << errorString << " "<< errorToken.line << "." << errorToken.column<<std::endl;
+            break;
+        case UNDEFINED_VARIABLE:
+            std::cout << "'" << errorString << "' variable was not defined" << std::endl;
+            break;
         default: std::cout<< code << " " << errorString;
+            break;
     }
     Ares::terminate();
 }

@@ -3,6 +3,8 @@
 //
 
 #include "CodeGen.h"
+
+#include "../Ares/Ares.h"
 #include "../AST/Node.h"
 
 void CodeGen::generateCode(std::string asmName, std::unique_ptr<Node> program) {
@@ -57,7 +59,7 @@ void CodeGen::restoreStackAfterCall(bool wasAligned) {
     }
 }
 
-int CodeGen::declareVariable(const std::string& variable) {
+int CodeGen::declareVariable(const std::string& variable, const std::string& type) {
     if (!offsets.contains(variable)) {
         offsets[variable] = offset;
         offset += 8;
@@ -66,5 +68,8 @@ int CodeGen::declareVariable(const std::string& variable) {
 }
 
 int CodeGen::getOffset(std::string variable) {
-    return declareVariable(variable);
+    if (!offsets.contains(variable)) {
+        Ares::error(UNDEFINED_VARIABLE, variable);
+    }
+    return offsets[variable];
 }

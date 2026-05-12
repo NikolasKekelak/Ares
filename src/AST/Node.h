@@ -5,11 +5,11 @@
 #ifndef ARES_NODE_H
 #define ARES_NODE_H
 
-#include <map>
-#include <string>
 #include <vector>
 #include <memory>
-
+#include "../CodeGen/CodeGen.h"
+#include "../myHeaders.h"
+#include <utility>
 #include "../Tokens/Token.h"
 
 class CodeGen;
@@ -167,6 +167,23 @@ public:
     std::unique_ptr<Expr> value;
 
     explicit ReturnStmt(std::unique_ptr<Expr> value);
+    void print(int indent) override;
+    void codegen(CodeGen& ctx) override;
+};
+
+
+class IfStmt : public Stmt {
+public:
+    std::unique_ptr<Expr> condition;
+    std::unique_ptr<Stmt> thenBranch;
+    std::unique_ptr<Stmt> elseBranch;
+
+    IfStmt(
+        std::unique_ptr<Expr> condition,
+        std::unique_ptr<Stmt> thenBranch,
+        std::unique_ptr<Stmt> elseBranch
+    );
+
     void print(int indent) override;
     void codegen(CodeGen& ctx) override;
 };

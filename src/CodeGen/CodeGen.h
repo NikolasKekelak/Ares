@@ -24,14 +24,17 @@ public:
         std::string asmName,
         std::unique_ptr<Node> program
         );
+
     void addInstruction(const std::string &instruction);
     void addInstruction(std::vector<std::string> &instructions);
+
     void beginFunction();
     void pushRax();
     void popTo(const std::string& registerName);
     bool alignStackForCall();
+
     void restoreStackAfterCall(bool wasAligned);
-    int declareVariable(const std::string& variable);
+    int declareVariable(const std::string& variable, const std::string& type);
     int getOffset(std::string variable);
 
 };
