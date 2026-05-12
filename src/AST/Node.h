@@ -5,6 +5,7 @@
 #ifndef ARES_NODE_H
 #define ARES_NODE_H
 
+#include <map>
 #include <string>
 #include <vector>
 #include <memory>

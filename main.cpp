@@ -105,6 +105,12 @@ int main(int argc, char **argv) {
         if (!strcmp(argv[i], "--print-ctx")) {
             Ares::setPrintCtx();
         }
+        if (!strcmp(argv[i], "--emit-all")) {
+            Ares::setPrintASM();
+            Ares::setPrintAST();
+            Ares::setPrintTokens();
+        }
+
         if (argv[i][0] == '-') {
             Ares::error(UNKNOWN_FLAG_ENCOUNTERED, argv[i]);
             continue;
@@ -116,7 +122,9 @@ int main(int argc, char **argv) {
             continue;
         }
         Ares::error(FILE_NOT_FOUND, argv[i]);
+
     }
+
     Ares::run();
     return 0;
 }

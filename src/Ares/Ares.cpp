@@ -177,9 +177,9 @@ void Ares::setWerrors() {
 
 void Ares::setPrintCtx() {
     settings.printCtx = true;
+}
 
-
-void Ares::printCtx() {
+void Ares::printCtx(){
     std::cout <<RED "Ares settings and context" RESET<<std::endl;
     PPRINT("Log file: ", context.logFile );
     PPRINT("Help file: ", context.helpFile );
