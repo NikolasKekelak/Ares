@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 #include <memory>
+
+#include "../CodeGen/CodeGen.h"
 #include "../Tokens/Token.h"
 
 /*
@@ -17,6 +19,7 @@
 class Node {
 public:
     virtual ~Node() = default;
+    virtual void codegen(CodeGen ctx ) = 0;
     virtual void print(int indent) = 0;
 };
 
@@ -34,7 +37,7 @@ public:
 class BinaryExpr : public Expr {
 public:
     std::unique_ptr<Expr> left;
-    Token op;
+    Token op; // TK_STAR,TK_PLUS,MINUS
     std::unique_ptr<Expr> right;
 
     void print(int indent) override;

@@ -20,4 +20,6 @@ add_executable(Ares main.cpp
         src/AST/Parser.h
         src/AST/Node.cpp
         src/AST/Node.h
+        src/CodeGen/CodeGen.cpp
+        src/CodeGen/CodeGen.h
 )

@@ -4,6 +4,8 @@
 
 #include "Ares.h"
 
+#include <utility>
+
 #include "../AST/Parser.h"
 
 AresContext Ares::context;
@@ -12,7 +14,7 @@ Lexer Ares::lexer;
 
 void Ares::init(std::string inputFile) {
     Logger::setLogFile(context.logFile);
-    lexer.setSource(inputFile);
+    lexer.setSource(std::move(inputFile));
 }
 
 void Ares::close() {
@@ -96,7 +98,8 @@ void Ares::error(std::vector<std::string> &msg) {
     Logger::Log(ERROR, msg);
 }
 
-void Ares::error(ErrorCode code, ErrorToken token) {
+void Ares::error(ErrorCode code, const ErrorToken &token) {
+    TODO("Remove this function")
     switch (code) {
         case UNKNOWN_CHARACTER_ENCOUNTERED:
             printf("Unknown character encountered at line %d, column %d: %s\n", token.line, token.column,

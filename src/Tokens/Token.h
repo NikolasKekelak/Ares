@@ -147,9 +147,9 @@ public:
     [[nodiscard]] TokenType getType() const;
 
     void print() {
-        std::cout << GREEN << getToken(type);
+        std::cout << GREEN << getToken(type) <<RESET;
         if (lexeme!="") {
-            std::cout << "(" YELLOW << lexeme << GREEN ")" RESET ;
+            std::cout <<GREEN 1 "(" YELLOW << lexeme << GREEN ")" RESET ;
         }
     }
 };

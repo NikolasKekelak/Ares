@@ -23,13 +23,17 @@ struct AresContext {
 };
 
 struct AresSettings {
+
     bool printTokens = false;
     bool printAST = false;
     bool printASM = false;
     bool printIR = false;
 
     bool compile = true;
+
+    bool optimizationChange = false;
     int optimizationLevel = 0; // -1 no optimizations, 0 default, 1 minor optimization, 2 major optimization, 3 aggresive optimization
+
     bool warnings = true;
     bool werrors  = true;
 
@@ -58,7 +62,7 @@ public:
 
     static void error(std::vector<std::string> &msg);
 
-    static void error(ErrorCode code, ErrorToken token);
+    static void error(ErrorCode code, const ErrorToken &token);
 
     static void setOutputFile(const std::string &filename);
     static void setPrintTokens();

@@ -56,7 +56,7 @@ class Lexer {
 
     };
 
-    bool isAtEnd();
+    bool isAtEnd() const;
 
     void scanToken();
 
@@ -64,11 +64,11 @@ class Lexer {
 
     void addToken(TokenType type);
 
-    void addToken(TokenType type, std::string literal);
+    void addToken(TokenType type, const std::string& literal);
 
     bool match(char expected);
 
-    char peekNext();
+    char peekNext() const;
 
     void _number();
     void _char();

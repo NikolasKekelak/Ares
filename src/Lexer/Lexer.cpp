@@ -23,8 +23,7 @@ void Lexer::setSource(std::string source) {
 }
 
 void Lexer::scanToken() {
-    char c = advance();
-    switch (c) {
+    switch (char c = advance()) {
         case '(': addToken(TK_LEFT_PAREN);
             break;
         case ')': addToken(TK_RIGHT_PAREN);
@@ -75,11 +74,10 @@ void Lexer::scanToken() {
 
         case '\n':
             line++;
-            column = 0;
+            column = 1;
             break;
         case ' ':
             break;
-
         case '\'': _char();
             break;
         case '\"': _string();
@@ -109,7 +107,7 @@ char Lexer::advance() {
     return source[current++];
 }
 
-bool Lexer::isAtEnd() {
+bool Lexer::isAtEnd() const {
     return current >= source.length();
 }
 
@@ -117,7 +115,7 @@ void Lexer::addToken(TokenType type) {
     addToken(type, "");
 }
 
-void Lexer::addToken(TokenType type, std::string literal) {
+void Lexer::addToken(TokenType type, const std::string& literal) {
     std::string text = source.substr(start, current - start);
     tokens.emplace_back(text, literal, type, line, column);
 }
@@ -133,7 +131,7 @@ bool Lexer::match(char expected) {
 }
 
 
-char Lexer::peekNext() {
+char Lexer::peekNext() const {
     if (isAtEnd()) return '\0';
     return source[current];
 }
@@ -166,7 +164,7 @@ void Lexer::_string() {
 void Lexer::_identifier() {
     while (isalnum(peekNext())) advance();
     auto str = source.substr(start, current - start);
-    if (keywords.find(str) != keywords.end()) {
+    if (keywords.contains(str)) {
         addToken(keywords[str]);
         return;
     }

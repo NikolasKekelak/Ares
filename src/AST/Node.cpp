@@ -164,8 +164,8 @@ void ReturnStmt::print(int indent) {
     INDENT(indent)
     std::cout << "return";
     if (value) {
-        std::cout << " ";
-        value->print(0);
+        std::cout << std::endl;
+        value->print(indent+1);
     }
     std::cout << std::endl;
 }
