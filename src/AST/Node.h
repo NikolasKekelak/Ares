@@ -9,17 +9,13 @@
 #include <vector>
 #include <memory>
 
-#include "../CodeGen/CodeGen.h"
 #include "../Tokens/Token.h"
 
-/*
- * Base class for all AST nodes.
- * Future semantic analysis hooks and IR/codegen integration can be added here.
- */
+class CodeGen;
 class Node {
 public:
     virtual ~Node() = default;
-    virtual void codegen(CodeGen ctx ) = 0;
+    virtual void codegen(CodeGen& ctx) = 0;
     virtual void print(int indent) = 0;
 };
 
@@ -42,6 +38,7 @@ public:
 
     void print(int indent) override;
     BinaryExpr(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right);
+    void codegen(CodeGen& ctx) override;
 };
 
 class UnaryExpr : public Expr {
@@ -51,6 +48,7 @@ public:
 
     void print(int indent) override;
     UnaryExpr(Token op, std::unique_ptr<Expr> right);
+    void codegen(CodeGen& ctx) override;
 };
 
 class LiteralExpr : public Expr {
@@ -59,6 +57,7 @@ public:
 
     explicit LiteralExpr(Token value);
     void print(int indent) override;
+    void codegen(CodeGen& ctx) override;
 };
 
 class VariableExpr : public Expr {
@@ -67,6 +66,8 @@ public:
 
     explicit VariableExpr(Token name);
     void print(int indent) override;
+    void codegen(CodeGen& ctx) override;
+
 };
 
 class AssignExpr : public Expr {
@@ -76,6 +77,7 @@ public:
 
     AssignExpr(Token name, std::unique_ptr<Expr> value);
     void print(int indent) override;
+    void codegen(CodeGen& ctx) override;
 };
 
 class CallExpr : public Expr {
@@ -85,6 +87,7 @@ public:
 
     CallExpr(std::unique_ptr<Expr> callee, std::vector<std::unique_ptr<Expr>> arguments);
     void print(int indent) override;
+    void codegen(CodeGen& ctx) override;
 
 
 };
@@ -96,6 +99,7 @@ public:
 
     MemberAccessExpr(std::unique_ptr<Expr> object, Token member);
     void print(int indent) override;
+    void codegen(CodeGen& ctx) override;
 
 };
 
@@ -116,6 +120,7 @@ public:
 
     explicit BlockStmt(std::vector<std::unique_ptr<Node>> statements);
     void print(int indent) override;
+    void codegen(CodeGen& ctx) override;
 };
 
 class VarDeclStmt : public Stmt {
@@ -126,6 +131,7 @@ public:
 
     VarDeclStmt(Token type, Token name, std::unique_ptr<Expr> initializer);
     void print(int indent) override;
+    void codegen(CodeGen& ctx) override;
 };
 
 class PrintStmt : public Stmt {
@@ -134,6 +140,7 @@ public:
 
     explicit PrintStmt(std::vector<std::unique_ptr<Expr>> expressions);
     void print(int indent) override;
+    void codegen(CodeGen& ctx) override;
 };
 
 class ReadStmt : public Stmt {
@@ -142,6 +149,7 @@ public:
 
     explicit ReadStmt(std::vector<std::unique_ptr<Expr>> targets);
     void print(int indent) override;
+    void codegen(CodeGen& ctx) override;
 };
 
 class ExpressionStmt : public Stmt {
@@ -150,6 +158,7 @@ public:
 
     explicit ExpressionStmt(std::unique_ptr<Expr> expression);
     void print(int indent) override;
+    void codegen(CodeGen& ctx) override;
 };
 
 class ReturnStmt : public Stmt {
@@ -158,6 +167,7 @@ public:
 
     explicit ReturnStmt(std::unique_ptr<Expr> value);
     void print(int indent) override;
+    void codegen(CodeGen& ctx) override;
 };
 
 // --- Declarations ---
@@ -180,6 +190,7 @@ public:
 
     FunctionDecl(Token returnType, Token name, std::vector<std::pair<Token, Token>> parameters, std::unique_ptr<BlockStmt> body);
     void print(int indent) override;
+    void codegen(CodeGen& ctx) override;
 };
 
 class Program : public Node {
@@ -188,6 +199,7 @@ public:
 
     explicit Program(std::vector<std::unique_ptr<Node>> declarations);
     void print(int indent) override;
+    void codegen(CodeGen& ctx) override;
 };
 
 #endif // ARES_NODE_H

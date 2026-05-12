@@ -22,6 +22,7 @@ inline std::string readFileToString(const std::string &filename) {
 
     return buffer.str();
 }
+
 // humbly stolen from https://stackoverflow.com/questions/12774207/fastest-way-to-check-if-a-file-exists-using-standard-c-c11-14-17-c
 inline bool file_exists (const std::string& name) {
     struct stat buffer;
@@ -44,19 +45,19 @@ int main(int argc, char **argv) {
             Ares::setOutputFile(argv[++i]);
             continue;
         }
-        if (!strcmp(argv[i], "--tokens")) {
+        if (!strcmp(argv[i], "--emit-tokens")) {
             Ares::setPrintTokens();
             continue;
         }
-        if (!strcmp(argv[i], "--ast")) {
+        if (!strcmp(argv[i], "--emit-ast")) {
             Ares::setPrintAST();
             continue;
         }
-        if (!strcmp(argv[i], "--asm")) {
+        if (!strcmp(argv[i], "--emit-asm")) {
             Ares::setPrintASM();
             continue;
         }
-        if (!strcmp(argv[i], "--ir")) {
+        if (!strcmp(argv[i], "--emit-ir")) {
             Ares::setPrintIR();
             continue;
         }
@@ -94,12 +95,15 @@ int main(int argc, char **argv) {
             continue;
         }
         if (!strcmp(argv[i], "-Wall")) {
-            TODO("All warnings will be added later")
+            Ares::setWarnings();
             continue;
         }
-        if (!strcmp(argv[i], "-Wextra")) {
-            TODO("Warnings will be handled as errors... maybe")
+        if (!strcmp(argv[i], "-Werror")) {
+            Ares::setWerrors();
             continue;
+        }
+        if (!strcmp(argv[i], "--print-ctx")) {
+            Ares::setPrintCtx();
         }
         if (argv[i][0] == '-') {
             Ares::error(UNKNOWN_FLAG_ENCOUNTERED, argv[i]);
@@ -108,6 +112,7 @@ int main(int argc, char **argv) {
         // no -.. = file to read
         if (file_exists(argv[i])) {
             Ares::init(readFileToString(argv[i]));
+            //Ares::add(argv[i])
             continue;
         }
         Ares::error(FILE_NOT_FOUND, argv[i]);

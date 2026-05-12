@@ -8,6 +8,9 @@
 
 #include "../AST/Parser.h"
 
+#define PPRINT(msg, val) std::cout << GREEN msg RESET << val << std::endl;
+
+
 AresContext Ares::context;
 AresSettings Ares::settings;
 Lexer Ares::lexer;
@@ -138,4 +141,38 @@ void Ares::setOptimizationLevel(int level) {
 
 int Ares::getOptimizationLevel() {
     return settings.optimizationLevel;
+}
+
+void Ares::setWarnings() {
+    // if (settings.warnings) {
+    //     Ares::error(WARNINGS_FLAG_ALREADY_SET);
+    // }
+    // if (settings.werrors) {
+    //     Ares::error(WERRORS_INSTEAD_OF_WARNINGS);
+    // }
+    settings.warnings = true;
+}
+
+void Ares::setWerrors() {
+    // if (settings.warnings) {
+    //     Ares::error(WARNINGS_INSTEAD_OF_WERRORS);
+    // }
+    // if (settings.werrors) {
+    //     Ares::error(WERRORS_FLAG_ALREADY_SET);
+    // }
+    settings.werrors = true;
+}
+
+void Ares::setPrintCtx() {
+    settings.printCtx = true;
+}
+
+void Ares::printCtx() {
+    std::cout <<RED "Ares settings and context" RESET<<std::endl;
+    PPRINT("Log file: ", context.logFile );
+    PPRINT("Help file: ", context.helpFile );
+    PPRINT("Config file: ", context.configFile );
+    PPRINT("Asm file: ", context.asmFile );
+    PPRINT("Output name: ", context.outFile );
+    std::cout << std::endl;
 }

@@ -45,13 +45,12 @@ class Lexer {
         {"async", TK_ASYNC},
         {"atomic", TK_ATOMIC},
         {"void", TK_VOID},
-        {"main", TK_MAIN},
         {"int", TK_INT},
         {"bool", TK_BOOL},
         {"char", TK_CHAR},
         {"string", TK_STRING},
         {"float", TK_FLOAT},
-        {"print", TK_STDOUT},
+        {"printf", TK_STDOUT},
         {"scanf", TK_STDIN}
 
     };

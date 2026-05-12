@@ -149,7 +149,7 @@ public:
     void print() {
         std::cout << GREEN << getToken(type) <<RESET;
         if (lexeme!="") {
-            std::cout <<GREEN 1 "(" YELLOW << lexeme << GREEN ")" RESET ;
+            std::cout <<GREEN "(" YELLOW << lexeme << GREEN ")" RESET ;
         }
     }
 };

@@ -19,6 +19,7 @@ struct AresContext {
     std::string asmFile = "out.asm";
     std::string outFile = "a";
 
+    // std::vector<std::string> inputFiles;
     std::string inputFile;
 };
 
@@ -34,9 +35,10 @@ struct AresSettings {
     bool optimizationChange = false;
     int optimizationLevel = 0; // -1 no optimizations, 0 default, 1 minor optimization, 2 major optimization, 3 aggresive optimization
 
-    bool warnings = true;
-    bool werrors  = true;
+    bool warnings = false;
+    bool werrors  = false;
 
+    bool printCtx = false;
 };
 
 class Ares {
@@ -72,6 +74,12 @@ public:
     static void setNoCompile();
     static void setOptimizationLevel(int level);
     static int  getOptimizationLevel();
+
+    static void setWarnings();
+    static void setWerrors();
+
+    static void setPrintCtx();
+    static void printCtx();
 };
 
 
