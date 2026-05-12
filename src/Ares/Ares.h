@@ -10,6 +10,7 @@
 #include "../Logging/Logger.h"
 #include "../Tokens/Token.h"
 #include "../Lexer/Lexer.h"
+#include "../CodeGen/CodeGen.h"
 
 struct AresContext {
 

@@ -43,21 +43,33 @@ void Ares::run() {
     Parser parser(lexer.getTokens());
     auto program = parser.parseProgram();
 
+
     if (settings.printAST) {
         program->print(0);
+    }
+
+
+
+    int optimization_level = settings.optimizationLevel;
+    if (optimization_level < 0) {
+        CodeGen codeGen;
+        codeGen.generateCode(context.asmFile, std::move(program));
+        if (settings.printASM) {
+            std::string command = "cat "+context.asmFile;
+            system(command.c_str());
+        }
+        if (!settings.compile) {
+            terminate();
+        }
+
+        system("make");
+        exit(0);
     }
 
     if (!settings.compile) {
         terminate();
     }
 
-    int optimization_level = settings.optimizationLevel;
-    std::cout << "Optimization level: " << optimization_level << std::endl;
-    if (optimization_level < 0) {
-        TODO("AST -> Source code")
-    }
-
-    TODO("Compilation using IR is not defined yet")
     if (optimization_level >= 1) {
         TODO("Constant folding, dead code removal")
     }
@@ -165,7 +177,7 @@ void Ares::setWerrors() {
 
 void Ares::setPrintCtx() {
     settings.printCtx = true;
-}
+
 
 void Ares::printCtx() {
     std::cout <<RED "Ares settings and context" RESET<<std::endl;

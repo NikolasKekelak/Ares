@@ -25,7 +25,7 @@ BinaryExpr::BinaryExpr(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Exp
 
 void BinaryExpr::codegen(CodeGen &ctx) {
     left->codegen(ctx);
-    ctx.addInstruction("    pop rax");
+    ctx.addInstruction("    push rax");
     right->codegen(ctx);
     ctx.addInstruction("    pop rbx");
 
@@ -36,16 +36,15 @@ void BinaryExpr::codegen(CodeGen &ctx) {
             });
             break;
         case TK_MINUS:
-            ctx.addInstruction({
-                "    mov rcx, rax"
-                "    mov rax, rbx"
-                "    sub rax, rcx"
-            });
+            ctx.addInstruction({"    mov rcx, rax"});
+            ctx.addInstruction({"    mov rax, rbx"});
+            ctx.addInstruction({"    sub rbx, rcx"});
             break;
         case TK_STAR:
             ctx.addInstruction({
                 "    imul rax, rbx"
             });
+            break;
         case TK_SLASH:
             ctx.addInstruction({
                 "    mov rcx, rax"
@@ -53,8 +52,10 @@ void BinaryExpr::codegen(CodeGen &ctx) {
                 "    cqo"
                 "    idiv rcx"
             });
+            break;
         default: TODO("Unknown binary operator");
     }
+    ctx.addInstruction("");
 
 }
 
@@ -83,6 +84,7 @@ void LiteralExpr::print(int indent) {
 
 void LiteralExpr::codegen(CodeGen &ctx) {
     ctx.addInstruction("    mov rax, " + value.getLexeme());
+    ctx.addInstruction("");
 }
 
 VariableExpr::VariableExpr(Token name)
@@ -96,7 +98,8 @@ void VariableExpr::print(int indent) {
 
 void VariableExpr::codegen(CodeGen& ctx) {
     int offset = ctx.getOffset(name.getLexeme());
-    ctx.addInstruction("mov rax, [rbp-" + std::to_string(offset) + "]");
+    ctx.addInstruction("    mov rax, [rbp-" + std::to_string(offset) + "]");
+    ctx.addInstruction("");
 }
 
 AssignExpr::AssignExpr(Token name, std::unique_ptr<Expr> value)
@@ -111,6 +114,7 @@ void AssignExpr::print(int indent) {
 }
 
 void AssignExpr::codegen(CodeGen &ctx) {
+    ctx.addInstruction("");
 }
 
 CallExpr::CallExpr(std::unique_ptr<Expr> callee, std::vector<std::unique_ptr<Expr> > arguments)
@@ -130,6 +134,8 @@ void CallExpr::print(int indent) {
 }
 
 void CallExpr::codegen(CodeGen &ctx) {
+    TODO("Function call")
+    ctx.addInstruction("");
 }
 
 MemberAccessExpr::MemberAccessExpr(std::unique_ptr<Expr> object, Token member)
@@ -145,6 +151,8 @@ void MemberAccessExpr::print(int indent) {
 }
 
 void MemberAccessExpr::codegen(CodeGen &ctx) {
+    TODO("Member access node print")
+    ctx.addInstruction("");
 }
 
 BlockStmt::BlockStmt(std::vector<std::unique_ptr<Node> > statements)
@@ -158,13 +166,14 @@ void BlockStmt::print(int indent) {
         stmt->print(indent + 1);
     }
     INDENT(indent)
-    std::cout << "}" << std::endl;
+   std::cout << "}" << std::endl;
 }
 
 void BlockStmt::codegen(CodeGen& ctx) {
     for (auto& stmt : statements) {
         stmt->codegen(ctx);
     }
+    ctx.addInstruction("");
 }
 
 VarDeclStmt::VarDeclStmt(Token type, Token name, std::unique_ptr<Expr> initializer)
@@ -185,7 +194,15 @@ void VarDeclStmt::print(int indent) {
     std::cout << std::endl;
 }
 
-void VarDeclStmt::codegen(CodeGen &ctx) {
+void VarDeclStmt::codegen(CodeGen& ctx) {
+    auto offset = ctx.getOffset(name.getLexeme());
+    initializer->codegen(ctx);
+    ctx.addInstruction(
+        "    mov [rbp-" +
+        std::to_string(offset) +
+        "], rax"
+    );
+    ctx.addInstruction("");
 }
 
 PrintStmt::PrintStmt(std::vector<std::unique_ptr<Expr> > expressions)
@@ -199,9 +216,18 @@ void PrintStmt::print(int indent) {
         expr->print(indent + 1);
     }
     std::cout << std::endl;
+
 }
 
-void PrintStmt::codegen(CodeGen &ctx) {
+void PrintStmt::codegen(CodeGen& ctx) {
+
+    expressions[0]->codegen(ctx);
+
+    ctx.addInstruction("    mov rsi, rax");
+    ctx.addInstruction("    lea rdi, [rel fmt_int]");
+    ctx.addInstruction("    xor rax, rax");
+    ctx.addInstruction("    call printf");
+    ctx.addInstruction("");
 }
 
 ReadStmt::ReadStmt(std::vector<std::unique_ptr<Expr> > targets)
@@ -218,6 +244,8 @@ void ReadStmt::print(int indent) {
 }
 
 void ReadStmt::codegen(CodeGen &ctx) {
+    TODO("Read statement codegen")
+    ctx.addInstruction("");
 }
 
 ExpressionStmt::ExpressionStmt(std::unique_ptr<Expr> expression)
@@ -230,6 +258,8 @@ void ExpressionStmt::print(int indent) {
 }
 
 void ExpressionStmt::codegen(CodeGen &ctx) {
+    TODO("Expression statement codegen")
+    ctx.addInstruction("");
 }
 
 ReturnStmt::ReturnStmt(std::unique_ptr<Expr> value)
@@ -246,7 +276,17 @@ void ReturnStmt::print(int indent) {
     std::cout << std::endl;
 }
 
-void ReturnStmt::codegen(CodeGen &ctx) {
+void ReturnStmt::codegen(CodeGen& ctx) {
+
+    if (value) {
+        value->codegen(ctx);
+    } else {
+        ctx.addInstruction("    xor rax, rax");
+    }
+
+    ctx.addInstruction("    mov rsp, rbp");
+    ctx.addInstruction("    pop rbp");
+    ctx.addInstruction("    ret");
 }
 
 FunctionDecl::FunctionDecl(Token returnType, Token name, std::vector<std::pair<Token, Token> > parameters,
@@ -282,10 +322,7 @@ void FunctionDecl::codegen(CodeGen& ctx) {
 
     body->codegen(ctx);
 
-    ctx.addInstruction("    xor rax, rax");
-    ctx.addInstruction("    mov rsp, rbp");
-    ctx.addInstruction("    pop rbp");
-    ctx.addInstruction("    ret");
+    ctx.addInstruction("");
 }
 
 Program::Program(std::vector<std::unique_ptr<Node> > declarations)
@@ -315,4 +352,5 @@ void Program::codegen(CodeGen& ctx) {
     for (auto& decl : declarations) {
         decl->codegen(ctx);
     }
+    ctx.addInstruction("");
 }
