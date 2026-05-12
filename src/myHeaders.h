@@ -14,4 +14,6 @@
 #define BLUE    "\033[34m"
 #define RESET   "\033[0m"
 
+// bottom size of stack
+#define STACK_OFFSET 0
 #endif //ARES_MYHEADERS_H

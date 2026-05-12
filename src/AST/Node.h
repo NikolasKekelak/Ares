@@ -18,6 +18,7 @@ public:
     virtual ~Node() = default;
     virtual void codegen(CodeGen& ctx) = 0;
     virtual void print(int indent) = 0;
+    virtual int getStackSize();
 };
 
 // --- Expressions ---
@@ -40,6 +41,7 @@ public:
     void print(int indent) override;
     BinaryExpr(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right);
     void codegen(CodeGen& ctx) override;
+
 };
 
 class UnaryExpr : public Expr {
@@ -122,6 +124,7 @@ public:
     explicit BlockStmt(std::vector<std::unique_ptr<Node>> statements);
     void print(int indent) override;
     void codegen(CodeGen& ctx) override;
+    int getStackSize() override;
 };
 
 class VarDeclStmt : public Stmt {
@@ -133,6 +136,7 @@ public:
     VarDeclStmt(Token type, Token name, std::unique_ptr<Expr> initializer);
     void print(int indent) override;
     void codegen(CodeGen& ctx) override;
+    int getStackSize() override;
 };
 
 class PrintStmt : public Stmt {

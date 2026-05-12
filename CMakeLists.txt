@@ -22,4 +22,6 @@ add_executable(Ares main.cpp
         src/AST/Node.h
         src/CodeGen/CodeGen.cpp
         src/CodeGen/CodeGen.h
+        src/Datatypes/DTT.cpp
+        src/Datatypes/DTT.h
 )

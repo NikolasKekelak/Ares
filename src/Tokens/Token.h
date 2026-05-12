@@ -110,6 +110,7 @@ inline std::string getToken(TokenType name) {
         case TK_CHAR: return "TK_CHAR";
         case TK_CHAR_LITERAL: return "TK_CHAR_LITERAL";
         case TK_EQUAL: return "TK_EQUAL";
+        case TK_NOT_EQUAL: return "TK_NOT_EQUAL";
         default: TODO("Unknown token");
             return "";
     }

@@ -4,8 +4,14 @@
 
 #include "Node.h"
 
+#include "../Datatypes/DTT.h"
+
 
 #define INDENT(indent) for (int i = 0; i < ((indent)*3); i++) std::cout << " ";
+
+int Node::getStackSize() {
+    return 0;
+}
 
 void BinaryExpr::print(int indent) {
     INDENT(indent)
@@ -218,7 +224,6 @@ void Program::print(int indent) {
 }
 
 
-
 void BinaryExpr::codegen(CodeGen &ctx) {
     left->codegen(ctx);
     ctx.pushRax();
@@ -243,28 +248,43 @@ void BinaryExpr::codegen(CodeGen &ctx) {
             ctx.addInstruction("    cqo");
             ctx.addInstruction("    idiv r11");
             break;
+        case TK_EQUAL:
+            ctx.addInstruction("    cmp r10, rax");
+            ctx.addInstruction("    sete al");
+            ctx.addInstruction("    movzx rax, al");
+            break;
+
+        case TK_NOT_EQUAL:
+            ctx.addInstruction("    cmp r10, rax");
+            ctx.addInstruction("    setne al");
+            ctx.addInstruction("    movzx rax, al");
+            break;
         default: TODO("Unknown binary operator");
     }
     ctx.addInstruction("");
-
 }
+
+
 void UnaryExpr::codegen(CodeGen &ctx) {
 }
+
 void LiteralExpr::codegen(CodeGen &ctx) {
     ctx.addInstruction("    mov rax, " + value.getLexeme());
     ctx.addInstruction("");
 }
-void VariableExpr::codegen(CodeGen& ctx) {
+
+void VariableExpr::codegen(CodeGen &ctx) {
     int offset = ctx.getOffset(name.getLexeme());
     ctx.addInstruction("    mov rax, [rbp-" + std::to_string(offset) + "]");
     ctx.addInstruction("");
 }
+
 void AssignExpr::codegen(CodeGen &ctx) {
     ctx.addInstruction("");
 }
-void CallExpr::codegen(CodeGen& ctx) {
 
-    static const char* ARG_REGS[] = {
+void CallExpr::codegen(CodeGen &ctx) {
+    static const char *ARG_REGS[] = {
         "rdi",
         "rsi",
         "rdx",
@@ -280,7 +300,6 @@ void CallExpr::codegen(CodeGen& ctx) {
     }
 
     for (int i = static_cast<int>(arguments.size()) - 1; i >= 0; i--) {
-
         arguments[i]->codegen(ctx);
         ctx.pushRax();
     }
@@ -289,7 +308,7 @@ void CallExpr::codegen(CodeGen& ctx) {
         ctx.popTo(ARG_REGS[i]);
     }
 
-    auto* var = dynamic_cast<VariableExpr*>(callee.get());
+    auto *var = dynamic_cast<VariableExpr *>(callee.get());
 
     if (!var) {
         TODO("only direct function calls supported");
@@ -299,17 +318,28 @@ void CallExpr::codegen(CodeGen& ctx) {
     ctx.addInstruction("    call " + var->name.getLexeme());
     ctx.restoreStackAfterCall(aligned);
 }
+
 void MemberAccessExpr::codegen(CodeGen &ctx) {
     TODO("Member access node print");
     ctx.addInstruction("");
 }
-void BlockStmt::codegen(CodeGen& ctx) {
-    for (auto& stmt : statements) {
+
+void BlockStmt::codegen(CodeGen &ctx) {
+    for (auto &stmt: statements) {
         stmt->codegen(ctx);
     }
     ctx.addInstruction("");
 }
-void VarDeclStmt::codegen(CodeGen& ctx) {
+
+int BlockStmt::getStackSize() {
+    int size = 0;
+    for (auto &stmt: statements) {
+        size+=stmt->getStackSize();
+    }
+    return size;
+}
+
+void VarDeclStmt::codegen(CodeGen &ctx) {
     auto offset = ctx.getOffset(name.getLexeme());
     initializer->codegen(ctx);
     ctx.addInstruction(
@@ -319,8 +349,12 @@ void VarDeclStmt::codegen(CodeGen& ctx) {
     );
     ctx.addInstruction("");
 }
-void PrintStmt::codegen(CodeGen& ctx) {
 
+int VarDeclStmt::getStackSize() {
+    return DTT::getSize(type.getLexeme());
+}
+
+void PrintStmt::codegen(CodeGen &ctx) {
     expressions[0]->codegen(ctx);
 
     ctx.addInstruction("    mov rsi, rax");
@@ -331,18 +365,20 @@ void PrintStmt::codegen(CodeGen& ctx) {
     ctx.restoreStackAfterCall(aligned);
     ctx.addInstruction("");
 }
+
 void ReadStmt::codegen(CodeGen &ctx) {
     TODO("Read statement codegen");
     ctx.addInstruction("");
 }
+
 void ExpressionStmt::codegen(CodeGen &ctx) {
     if (expression) {
         expression->codegen(ctx);
     }
     ctx.addInstruction("");
 }
-void ReturnStmt::codegen(CodeGen& ctx) {
 
+void ReturnStmt::codegen(CodeGen &ctx) {
     if (value) {
         value->codegen(ctx);
     } else {
@@ -379,10 +415,11 @@ void IfStmt::print(int indent) {
     }
 }
 
-void IfStmt::codegen(CodeGen& ctx) {
+void IfStmt::codegen(CodeGen &ctx) {
     std::string elseLabel = ctx.makeLabel("else");
     std::string endLabel  = ctx.makeLabel("endif");
 
+    // condition result in rax
     condition->codegen(ctx);
 
     ctx.addInstruction("    cmp rax, 0");
@@ -393,22 +430,26 @@ void IfStmt::codegen(CodeGen& ctx) {
         ctx.addInstruction("    je " + endLabel);
     }
 
+    // THEN
     thenBranch->codegen(ctx);
 
+    // skip else
     if (elseBranch) {
-        ctx.addInstruction("    je " + endLabel);
+        ctx.addInstruction("    jmp " + endLabel);
     }
 
+    // ELSE LABEL
     if (elseBranch) {
-        ctx.addInstruction("    je " + elseLabel);
+        ctx.addInstruction(elseLabel + ":");
         elseBranch->codegen(ctx);
     }
 
-    ctx.addInstruction("    je " + endLabel);
+    // END LABEL
+    ctx.addInstruction(endLabel + ":");
 }
 
-void FunctionDecl::codegen(CodeGen& ctx) {
-    static const char* ARG_REGS[] = {
+void FunctionDecl::codegen(CodeGen &ctx) {
+    static const char *ARG_REGS[] = {
         "rdi",
         "rsi",
         "rdx",
@@ -425,15 +466,18 @@ void FunctionDecl::codegen(CodeGen& ctx) {
 
     ctx.beginFunction();
     ctx.addInstruction("");
-    ctx.addInstruction(name.getLexeme()+":");
+    ctx.addInstruction(name.getLexeme() + ":");
     ctx.addInstruction("    push rbp");
     ctx.addInstruction("    mov rbp, rsp");
 
-    int stackSize = 256;
+    int stackSize = STACK_OFFSET + body->getStackSize();
+    for (int i = 0; i < parameters.size(); i++) {
+        stackSize += DTT::getSize(parameters[i].first.getLiteral());
+    }
     ctx.addInstruction("    sub rsp, " + std::to_string(stackSize));
 
     for (int i = 0; i < parameters.size(); i++) {
-        int parameterOffset = ctx.declareVariable(parameters[i].second.getLexeme() , parameters[i].first.getLexeme());
+        int parameterOffset = ctx.declareVariable(parameters[i].second.getLexeme(), parameters[i].first.getLexeme());
         ctx.addInstruction(
             "    mov [rbp-" +
             std::to_string(parameterOffset) +
@@ -450,7 +494,8 @@ void FunctionDecl::codegen(CodeGen& ctx) {
     ctx.addInstruction("    ret");
     ctx.addInstruction("");
 }
-void Program::codegen(CodeGen& ctx) {
+
+void Program::codegen(CodeGen &ctx) {
     ctx.addInstruction("global main");
     ctx.addInstruction("extern printf");
     ctx.addInstruction("");
@@ -461,7 +506,7 @@ void Program::codegen(CodeGen& ctx) {
 
     ctx.addInstruction("section .text");
 
-    for (auto& decl : declarations) {
+    for (auto &decl: declarations) {
         decl->codegen(ctx);
     }
     ctx.addInstruction("");
