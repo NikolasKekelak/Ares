@@ -88,6 +88,25 @@ std::unique_ptr<Stmt> Parser::parseStatement() {
         return std::make_unique<PrintStmt>(std::move(expressions));
     }
 
+    if (match({TK_IF})) {
+        consume(TK_LEFT_PAREN, "Expect '(' after 'if'.");
+        auto condition = parseExpression();
+        consume(TK_RIGHT_PAREN, "Expect ')' after if condition.");
+
+        auto thenBranch = parseStatement();
+
+        std::unique_ptr<Stmt> elseBranch = nullptr;
+        if (match({TK_ELSE})) {
+            elseBranch = parseStatement();
+        }
+
+        return std::make_unique<IfStmt>(
+            std::move(condition),
+            std::move(thenBranch),
+            std::move(elseBranch)
+        );
+    }
+
     if (match({TK_STDIN})) {
         consume(TK_RIGHT_SHIFT, "Expect '>>' after 'stdin'.");
         std::vector<std::unique_ptr<Expr>> targets;

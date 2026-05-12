@@ -17,9 +17,10 @@ class CodeGen {
     std::map<std::string, int> offsets = {};
     int offset = 8;
     int temporaryStackSlots = 0;
+    int labelCounter = 0;
+
 public:
 
-    // This method
     void generateCode(
         std::string asmName,
         std::unique_ptr<Node> program
@@ -37,6 +38,7 @@ public:
     int declareVariable(const std::string& variable, const std::string& type);
     int getOffset(std::string variable);
 
+    std::string makeLabel(const std::string &base);
 };
 
 

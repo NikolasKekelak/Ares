@@ -353,6 +353,60 @@ void ReturnStmt::codegen(CodeGen& ctx) {
     ctx.addInstruction("    pop rbp");
     ctx.addInstruction("    ret");
 }
+
+IfStmt::IfStmt(
+    std::unique_ptr<Expr> condition,
+    std::unique_ptr<Stmt> thenBranch,
+    std::unique_ptr<Stmt> elseBranch
+) : condition(std::move(condition)),
+    thenBranch(std::move(thenBranch)),
+    elseBranch(std::move(elseBranch)) {
+}
+
+void IfStmt::print(int indent) {
+    INDENT(indent)
+    std::cout << "if" << std::endl;
+
+    condition->print(indent + 1);
+    std::cout << std::endl;
+
+    thenBranch->print(indent + 1);
+
+    if (elseBranch) {
+        INDENT(indent)
+        std::cout << "else" << std::endl;
+        elseBranch->print(indent + 1);
+    }
+}
+
+void IfStmt::codegen(CodeGen& ctx) {
+    std::string elseLabel = ctx.makeLabel("else");
+    std::string endLabel  = ctx.makeLabel("endif");
+
+    condition->codegen(ctx);
+
+    ctx.addInstruction("    cmp rax, 0");
+
+    if (elseBranch) {
+        ctx.addInstruction("    je " + elseLabel);
+    } else {
+        ctx.addInstruction("    je " + endLabel);
+    }
+
+    thenBranch->codegen(ctx);
+
+    if (elseBranch) {
+        ctx.addInstruction("    je " + endLabel);
+    }
+
+    if (elseBranch) {
+        ctx.addInstruction("    je " + elseLabel);
+        elseBranch->codegen(ctx);
+    }
+
+    ctx.addInstruction("    je " + endLabel);
+}
+
 void FunctionDecl::codegen(CodeGen& ctx) {
     static const char* ARG_REGS[] = {
         "rdi",

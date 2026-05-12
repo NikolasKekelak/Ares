@@ -73,3 +73,7 @@ int CodeGen::getOffset(std::string variable) {
     }
     return offsets[variable];
 }
+
+std::string CodeGen::makeLabel(const std::string& base) {
+    return "." + base + "_" + std::to_string(labelCounter++);
+}

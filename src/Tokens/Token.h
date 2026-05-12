@@ -109,6 +109,7 @@ inline std::string getToken(TokenType name) {
         case TK_STRING: return "TK_STRING";
         case TK_CHAR: return "TK_CHAR";
         case TK_CHAR_LITERAL: return "TK_CHAR_LITERAL";
+        case TK_EQUAL: return "TK_EQUAL";
         default: TODO("Unknown token");
             return "";
     }
@@ -147,9 +148,9 @@ public:
     [[nodiscard]] TokenType getType() const;
 
     void print() {
-        std::cout << GREEN << getToken(type) <<RESET;
-        if (lexeme!="") {
-            std::cout <<GREEN "(" YELLOW << lexeme << GREEN ")" RESET ;
+        std::cout << GREEN << getToken(type) << RESET;
+        if (lexeme != "") {
+            std::cout << GREEN "(" YELLOW << lexeme << GREEN ")" RESET;
         }
     }
 };
