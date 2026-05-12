@@ -10,6 +10,7 @@
 
 struct DTTEntry {
     int size; // in bytes
+    std::string wordType;
 };
 
 // Data type table
@@ -17,6 +18,8 @@ class DTT {
     static std::unordered_map<std::string, DTTEntry> table;
 public:
     static int getSize(std::string type);
+
+    static std::string getWordType(const std::string &string);
 };
 
 

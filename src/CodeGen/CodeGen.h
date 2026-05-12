@@ -15,7 +15,7 @@ class Node;
 class CodeGen {
     std::vector<std::string> instructions = {};
     std::map<std::string, int> offsets = {};
-    int offset = 8;
+    int offset = 0;
     int temporaryStackSlots = 0;
     int labelCounter = 0;
 

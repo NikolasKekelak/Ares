@@ -340,10 +340,10 @@ int BlockStmt::getStackSize() {
 }
 
 void VarDeclStmt::codegen(CodeGen &ctx) {
-    auto offset = ctx.getOffset(name.getLexeme());
+    auto offset = ctx.declareVariable(name.getLexeme(),type.getLiteral());
     initializer->codegen(ctx);
     ctx.addInstruction(
-        "    mov [rbp-" +
+        "    mov "+ DTT::getWordType(type.getLiteral()) +" [rbp-" +
         std::to_string(offset) +
         "], rax"
     );
@@ -458,6 +458,11 @@ void FunctionDecl::codegen(CodeGen &ctx) {
         "r9"
     };
 
+    int stackSize = STACK_OFFSET + body->getStackSize();
+    for (int i = 0; i < parameters.size(); i++) {
+        stackSize += DTT::getSize(parameters[i].first.getLiteral());
+    }
+
     constexpr int REGISTER_ARG_COUNT = sizeof(ARG_REGS) / sizeof(ARG_REGS[0]);
 
     if (parameters.size() > REGISTER_ARG_COUNT) {
@@ -470,14 +475,11 @@ void FunctionDecl::codegen(CodeGen &ctx) {
     ctx.addInstruction("    push rbp");
     ctx.addInstruction("    mov rbp, rsp");
 
-    int stackSize = STACK_OFFSET + body->getStackSize();
-    for (int i = 0; i < parameters.size(); i++) {
-        stackSize += DTT::getSize(parameters[i].first.getLiteral());
-    }
+
     ctx.addInstruction("    sub rsp, " + std::to_string(stackSize));
 
     for (int i = 0; i < parameters.size(); i++) {
-        int parameterOffset = ctx.declareVariable(parameters[i].second.getLexeme(), parameters[i].first.getLexeme());
+        int parameterOffset = ctx.declareVariable(parameters[i].second.getLexeme(), parameters[i].first.getLiteral());
         ctx.addInstruction(
             "    mov [rbp-" +
             std::to_string(parameterOffset) +

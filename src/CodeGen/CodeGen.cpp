@@ -6,6 +6,7 @@
 
 #include "../Ares/Ares.h"
 #include "../AST/Node.h"
+#include "../Datatypes/DTT.h"
 
 void CodeGen::generateCode(std::string asmName, std::unique_ptr<Node> program) {
     program->codegen(*this);
@@ -61,8 +62,8 @@ void CodeGen::restoreStackAfterCall(bool wasAligned) {
 
 int CodeGen::declareVariable(const std::string& variable, const std::string& type) {
     if (!offsets.contains(variable)) {
+        offset += DTT::getSize(type);
         offsets[variable] = offset;
-        offset += 8;
     }
     return offsets[variable];
 }
