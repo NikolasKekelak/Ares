@@ -3,6 +3,8 @@
 //
 
 #include "Lexer.h"
+
+#include <utility>
 #include "../myHeaders.h"
 #include "../Ares/Ares.h"
 
@@ -19,7 +21,8 @@ std::vector<Token> &Lexer::getTokens() {
 }
 
 void Lexer::setSource(std::string source) {
-    this->source = std::move(source);
+    this->source = readFileToString(source);
+    this->sourceFile = std::move(source);
 }
 
 void Lexer::scanToken() {
@@ -92,7 +95,7 @@ void Lexer::scanToken() {
             }
             else {
                 Token err = Token(std::string(1,c), "", TK_UNKNOWN, line, column);
-                Ares::error(UNKNOWN_CHARACTER_ENCOUNTERED,err.getErrorToken());
+                Ares::error(UNKNOWN_CHARACTER_ENCOUNTERED,err.getErrorToken(sourceFile));
             }
         }
     }

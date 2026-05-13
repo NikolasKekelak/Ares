@@ -118,6 +118,7 @@ inline std::string getToken(TokenType name) {
 
 struct ErrorToken {
     std::string literal;
+    std::string file;
     TokenType type;
     int line;
     int column;
@@ -136,7 +137,7 @@ public:
     Token() {
     };
 
-    ErrorToken getErrorToken();
+    ErrorToken getErrorToken(std::string file);
 
     [[nodiscard]] std::string getLiteral() const;
 

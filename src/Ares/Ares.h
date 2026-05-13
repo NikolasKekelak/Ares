@@ -14,11 +14,12 @@
 
 struct AresContext {
 
-    std::string logFile = "log";
-    std::string helpFile = "help";
+    std::string logFile    = "log";
+    std::string helpFile   = "help";
     std::string configFile = "config";
-    std::string asmFile = "out.asm";
-    std::string outFile = "a";
+    std::string asmFile    = "out.asm";
+    std::string oFile      = "out.o";
+    std::string outFile    = "a";
 
     // std::vector<std::string> inputFiles;
     std::string inputFile;
@@ -48,7 +49,7 @@ class Ares {
     static Lexer lexer;
 
 public:
-    static void init(std::string inputFile);
+    static void init();
 
     static void close();
 

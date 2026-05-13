@@ -7,7 +7,7 @@
 #include <utility>
 
 #include "../AST/Parser.h"
-
+#include "../fileManager.h"
 #define PPRINT(msg, val) std::cout << GREEN msg RESET << val << std::endl;
 
 
@@ -15,9 +15,8 @@ AresContext Ares::context;
 AresSettings Ares::settings;
 Lexer Ares::lexer;
 
-void Ares::init(std::string inputFile) {
+void Ares::init() {
     Logger::setLogFile(context.logFile);
-    lexer.setSource(std::move(inputFile));
 }
 
 void Ares::close() {
@@ -31,6 +30,8 @@ void Ares::terminate() {
 }
 
 void Ares::run() {
+    auto source = FileManager::getNextFile();
+    lexer.setSource(source);
     lexer.scanTokens();
     if (settings.printTokens) {
         for (auto it: lexer.getTokens()) {
@@ -40,7 +41,7 @@ void Ares::run() {
     }
 
     // Parse AST
-    Parser parser(lexer.getTokens());
+    Parser parser(lexer.getTokens(), source);
     auto program = parser.parseProgram();
 
 
@@ -62,7 +63,12 @@ void Ares::run() {
             terminate();
         }
 
-        system("make");
+
+        system(("nasm -f elf64 "+context.asmFile +" -o " + context.oFile).c_str() );
+        system(("gcc "+context.oFile+" -o "+context.outFile+" -no-pie").c_str() );
+        system(("rm -f " + context.oFile + " " + context.asmFile).c_str() );
+        close();
+
         exit(0);
     }
 

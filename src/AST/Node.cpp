@@ -259,6 +259,11 @@ void BinaryExpr::codegen(CodeGen &ctx) {
             ctx.addInstruction("    setne al");
             ctx.addInstruction("    movzx rax, al");
             break;
+        case TK_LESS_EQUAL:
+            ctx.addInstruction("    cmp r10, rax");
+            ctx.addInstruction("    setle al");
+            ctx.addInstruction("    movzx rax, al");
+            break;
         default: TODO("Unknown binary operator");
     }
     ctx.addInstruction("");
@@ -343,7 +348,7 @@ void VarDeclStmt::codegen(CodeGen &ctx) {
     auto offset = ctx.declareVariable(name.getLexeme(),type.getLiteral());
     initializer->codegen(ctx);
     ctx.addInstruction(
-        "    mov "+ DTT::getWordType(type.getLiteral()) +" [rbp-" +
+        "    mov  [rbp-" +
         std::to_string(offset) +
         "], rax"
     );

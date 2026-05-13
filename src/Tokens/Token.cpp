@@ -14,8 +14,8 @@ Token::Token(std::string literal, std::string lexeme, const TokenType type, cons
     this->column = column;
 }
 
-ErrorToken Token::getErrorToken() {
-    return {literal, type, line, column};
+ErrorToken Token::getErrorToken(std::string file) {
+    return {literal, std::move(file), type, line, column};
 }
 
 std::string Token::getLiteral() const {

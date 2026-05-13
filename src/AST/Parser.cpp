@@ -10,7 +10,7 @@ struct ParseError : public std::runtime_error {
     using std::runtime_error::runtime_error;
 };
 
-Parser::Parser(std::vector<Token> tokens) : tokens(std::move(tokens)) {
+Parser::Parser(std::vector<Token> tokens, std::string sourceFile) : tokens(std::move(tokens)), sourceFile(std::move(sourceFile)) {
     if (this->tokens.empty()) {
         this->tokens.emplace_back("", "", TK_EOF, 0, 0);
     }
@@ -159,7 +159,7 @@ std::unique_ptr<Expr> Parser::parseAssignment() {
             return std::make_unique<AssignExpr>(name, std::move(value));
         }
 
-        Ares::error(SYNTAX_ERROR, "Invalid assignment target.", previous().getErrorToken());
+        Ares::error(SYNTAX_ERROR, "Invalid assignment target.", previous().getErrorToken(sourceFile));
     }
 
     return expr;
@@ -197,7 +197,6 @@ std::unique_ptr<Expr> Parser::parseTerm() {
         auto right = parseFactor();
         expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
     }
-
     return expr;
 }
 
@@ -253,7 +252,7 @@ std::unique_ptr<Expr> Parser::parsePrimary() {
         consume(TK_RIGHT_PAREN, "Expect ')' after expression.");
         return expr;
     }
-    Ares::error(SYNTAX_ERROR, "Expect expression.", previous().getErrorToken());
+    Ares::error(SYNTAX_ERROR, "Expect expression.", previous().getErrorToken(sourceFile));
     return nullptr;
 }
 
@@ -261,7 +260,7 @@ Token Parser::consume(TokenType type, const std::string& message) {
     if (peek().getType() == type) {
         return advance();
     }
-    Ares::error(SYNTAX_ERROR, message, peek().getErrorToken());
+    Ares::error(SYNTAX_ERROR, message, peek().getErrorToken(sourceFile));
     throw ParseError(message);
 }
 

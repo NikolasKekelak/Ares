@@ -5,35 +5,15 @@
 #include "src/temp_testing/test_compile_tokens_to_asm.h"
 
 #include <string>
-#include <fstream>
-#include <sstream>
-#include <sys/stat.h>
+
+#include "src/fileManager.h"
 #include "src/Ares/Ares.h"
 
-inline std::string readFileToString(const std::string &filename) {
-    std::ifstream file(filename);
-
-    if (!file.is_open()) {
-        throw std::runtime_error("Failed to open file: " + filename);
-    }
-
-    std::ostringstream buffer;
-    buffer << file.rdbuf();
-
-    return buffer.str();
-}
-
-// humbly stolen from https://stackoverflow.com/questions/12774207/fastest-way-to-check-if-a-file-exists-using-standard-c-c11-14-17-c
-inline bool file_exists (const std::string& name) {
-    struct stat buffer;
-    return (stat (name.c_str(), &buffer) == 0);
-}
 
 int main(int argc, char **argv) {
     if (argc < 2) {
         Ares::help();
     }
-
     for (int i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
             Ares::help();
@@ -116,15 +96,10 @@ int main(int argc, char **argv) {
             continue;
         }
         // no -.. = file to read
-        if (file_exists(argv[i])) {
-            Ares::init(readFileToString(argv[i]));
-            //Ares::add(argv[i])
-            continue;
-        }
-        Ares::error(FILE_NOT_FOUND, argv[i]);
-
+        FileManager::addFile(argv[i]);
     }
-
+    Ares::init();
     Ares::run();
+
     return 0;
 }

@@ -7,8 +7,8 @@
 #include <iostream>
 
 std::unordered_map<std::string, DTTEntry> DTT::table = {
-    {"int",{4, "dword"}}, // temporary
-    {"short", {2, "word"}},
+    {"int",{8, "dword"}}, // temporary
+    {"short", {8, "word"}},
     {"long", {8, "qword"}}
 };
 

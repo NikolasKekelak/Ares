@@ -14,6 +14,7 @@ class Token;
 
 class Lexer {
     std::string source;
+    std::string sourceFile;
     std::vector<Token> tokens;
 
     // couple of fields to keep track of where the scanner is in the source code.

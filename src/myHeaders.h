@@ -7,6 +7,7 @@
 
 #define TODO_SIMPLE
 #include "stupid.h"
+#include "utils.h"
 
 #define RED     "\033[31m"
 #define GREEN   "\033[32m"
@@ -16,4 +17,5 @@
 
 // bottom size of stack
 #define STACK_OFFSET 0
+
 #endif //ARES_MYHEADERS_H

@@ -13,6 +13,7 @@
 class Parser {
     std::vector<Token> tokens;
     int current = 0;
+    std::string sourceFile;
 
     std::unique_ptr<Node> parseDeclaration();
 
@@ -53,7 +54,7 @@ class Parser {
     void synchronize();
 
 public:
-    explicit Parser(std::vector<Token> tokens);
+    explicit Parser(std::vector<Token> tokens, std::string sourceFile);
 
     std::unique_ptr<Program> parseProgram();
 };

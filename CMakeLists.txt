@@ -24,4 +24,7 @@ add_executable(Ares main.cpp
         src/CodeGen/CodeGen.h
         src/Datatypes/DTT.cpp
         src/Datatypes/DTT.h
+        src/fileManager.cpp
+        src/fileManager.h
+        src/utils.h
 )
